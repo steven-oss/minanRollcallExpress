@@ -6,7 +6,9 @@ const sequelize = new Sequelize('minaanrollcall',process.env.MYSQL_USERNAME,proc
 })
 
 const gender = require('./mysql/gender')(sequelize,Sequelize)
+const member = require('./mysql/member')(sequelize,Sequelize)
 
 module.exports={
-    gender
+    gender,
+    member
 }

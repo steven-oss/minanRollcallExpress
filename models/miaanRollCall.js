@@ -10,5 +10,6 @@ const member = require('./mysql/member')(sequelize,Sequelize)
 
 module.exports={
     gender,
-    member
+    member,
+    sequelize
 }

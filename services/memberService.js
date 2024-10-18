@@ -1,4 +1,5 @@
 const memberRepository = require('../repositories/memberRepository');
+const { rollCall } = require('../models/miaanRollCall'); // 確保這裡的路徑正確
 
 class MemberService {
     async searchMembersByUsername(username) {
@@ -38,13 +39,27 @@ class MemberService {
         return await memberRepository.createMember(memberData);
     }
 
-    async updateMember(id, updateData) {
+    async updateMemberAndRollCalls(id, updateData) {
         const member = await memberRepository.findById(id);
         if (!member) {
             throw new Error('No member found with the given id');
         }
+
+        // 更新會員資料
         await memberRepository.updateMember(member, updateData);
-        return member;
+
+        // 更新對應的 RollCall 記錄
+        await rollCall.update(
+            {
+                gender: updateData.gender, // 假設要更新 gender
+                username: updateData.username, // 假設要更新 username
+                isAdult:updateData.isAdult,
+            }, 
+            { where: { memberId: id } } // 使用外鍵查找 RollCall
+        );
+
+        // 返回更新後的會員資料
+        return await memberRepository.findById(id); // 可選：回傳更新後的會員資料
     }
 }
 

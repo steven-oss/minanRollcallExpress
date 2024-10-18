@@ -95,7 +95,7 @@ exports.updateMember = [
         }
 
         try {
-            const updatedMember = await memberService.updateMember(req.params.id, req.body);
+            const updatedMember = await memberService.updateMemberAndRollCalls(req.params.id, req.body);
             res.json({ message: 'successful', data: updatedMember });
         } catch (error) {
             if (error.message === 'No member found with the given id') {

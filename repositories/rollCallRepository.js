@@ -33,6 +33,33 @@ class RollCallRepository{
     async bulkCreate(rollCallData) {
         return await rollCall.bulkCreate(rollCallData);
     }
+
+    async findAllByUsername(username) {
+        return await rollCall.findAll({
+            where: {
+                username: {
+                    [Op.like]: `%${username}%`
+                }
+            }
+        });
+    }
+
+    async findRollCallById (id) {
+        return await rollCall.findByPk(id);
+    }
+
+    async updateCheckStatus(id,check){
+        // 使用 Sequelize 更新資料庫
+      const rollCallRecord = await rollCall.findByPk(id);
+  
+      if (!rollCallRecord) {
+        return null;
+    }
+  
+      // 更新 check 欄位
+      rollCallRecord.check = check;
+      await rollCallRecord.save();
+    }
 }
 
 

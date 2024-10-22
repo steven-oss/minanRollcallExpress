@@ -1,4 +1,5 @@
 const rollCallService= require('../services/rollCallService')
+const { check, validationResult } = require('express-validator');
 
 
 // 建立表單
@@ -36,3 +37,46 @@ exports.getPaginatedRollCall = async (req, res) => {
     }
 };
 
+// 搜尋成員
+exports.searchRollCallMembers = async (req, res) => {
+    try {
+        const { username } = req.query;
+        if (!username) {
+            return res.status(400).json({ error: 'username query parameter is required' });
+        }
+        const members = await rollCallService.searchRollCallMemberByUsername(username);
+        res.json({ message: 'successful', data: members });
+    } catch (error) {
+        if (error.message === 'No members found') {
+            return res.status(404).json({ message: error.message });
+        }
+        console.error('連接數據庫時出現錯誤：', error);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.updateCheckStatus = [
+    check('check').isBoolean().withMessage('Check must be a boolean value'),
+
+    async (req,res)=>{
+        const errors = validationResult(req);
+
+    // 如果有驗證錯誤，返回 400 錯誤
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        const { id } = req.params;
+        const { check } = req.body;
+
+        // 調用 service 層更新 check 欄位
+        const updatedRecord = await rollCallService.updateCheckStatus(id, check);
+
+        res.json({ message: 'Check status updated successfully', updatedRecord });
+    } catch (error) {
+        console.error('Error updating check status:', error);
+        res.status(500).json({ message: error.message });
+    }
+    }
+]

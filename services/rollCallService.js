@@ -47,6 +47,27 @@ class RollCallService{
         // 4. 批量插入 RollCall 表
         await rollCallRepository.bulkCreate(rollCallData);
     }
+
+    async searchRollCallMemberByUsername(username) {
+        const rollCallMembers = await rollCallRepository.findAllByUsername(username);
+        if (rollCallMembers.length === 0) {
+            throw new Error('No members found');
+        }
+        return rollCallMembers;
+    }
+
+    async updateCheckStatus(id,check){
+          // 查找記錄
+        const rollCallRecord = await rollCallRepository.findRollCallById(id);
+
+        // 如果記錄不存在，拋出錯誤
+        if (!rollCallRecord) {
+            throw new Error('Record not found');
+        }
+
+        // 更新並返回更新後的記錄
+        return await rollCallRepository.updateCheckStatus(id, check);
+    }
 }
 
 module.exports = new RollCallService();

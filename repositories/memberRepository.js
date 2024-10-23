@@ -2,15 +2,19 @@ const { member } = require('../models/miaanRollCall');
 const { Op } = require('sequelize');
 
 class MemberRepository {
-    async findAllByUsername(username) {
-        return await member.findAll({
+    async findAllByUsername(username, page, pageSize) {
+        const offset = (page - 1) * pageSize; // 計算偏移量
+        return await member.findAndCountAll({
             where: {
                 username: {
                     [Op.like]: `%${username}%`
                 }
-            }
+            },
+            limit: pageSize, // 限制每頁的數量
+            offset: offset // 設定偏移量
         });
     }
+    
 
     async findPaginated(page, pageSize) {
         return await member.findAndCountAll({
@@ -33,6 +37,15 @@ class MemberRepository {
 
     async updateMember(memberInstance, updateData) {
         return await memberInstance.update(updateData);
+    }
+
+    async findByPhoneExcludingId(phone, excludeId) {
+        return await member.findOne({
+            where: {
+                phone: phone,
+                id: { [Op.ne]: excludeId }
+            }
+        });
     }
 }
 

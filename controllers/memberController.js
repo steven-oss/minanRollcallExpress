@@ -5,11 +5,20 @@ const memberService = require('../services/memberService');
 exports.searchMembers = async (req, res) => {
     try {
         const { username } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 10;
+
         if (!username) {
             return res.status(400).json({ error: 'username query parameter is required' });
         }
-        const members = await memberService.searchMembersByUsername(username);
-        res.json({ message: 'successful', data: members });
+
+        const paginatedData = await memberService.searchMembersByUsername(username, page, pageSize);
+
+        res.json({ 
+            message: 'successful', 
+            data: paginatedData.memberList, 
+            pagination: paginatedData.pagination
+        });
     } catch (error) {
         if (error.message === 'No members found') {
             return res.status(404).json({ message: error.message });
@@ -18,6 +27,7 @@ exports.searchMembers = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+
 
 // 分頁顯示成員
 exports.getPaginatedMembers = async (req, res) => {
@@ -98,7 +108,7 @@ exports.updateMember = [
             const updatedMember = await memberService.updateMemberAndRollCalls(req.params.id, req.body);
             res.json({ message: 'successful', data: updatedMember });
         } catch (error) {
-            if (error.message === 'No member found with the given id') {
+            if (error.message === 'No member found with the given id' || "The phone number is already in use by another member.") {
                 return res.status(404).json({ message: error.message });
             }
             console.error('連接數據庫時出現錯誤：', error);

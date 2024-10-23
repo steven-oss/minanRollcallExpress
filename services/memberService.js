@@ -2,13 +2,23 @@ const memberRepository = require('../repositories/memberRepository');
 const { rollCall } = require('../models/miaanRollCall'); // 確保這裡的路徑正確
 
 class MemberService {
-    async searchMembersByUsername(username) {
-        const members = await memberRepository.findAllByUsername(username);
-        if (members.length === 0) {
+    async searchMembersByUsername(username, page, pageSize) {
+        const { count: total, rows: memberList } = await memberRepository.findAllByUsername(username, page, pageSize);
+        if (memberList.length === 0) {
             throw new Error('No members found');
         }
-        return members;
+
+        return {
+            memberList,
+            pagination: {
+                totalMembers: total,
+                totalPages: Math.ceil(total / pageSize),
+                currentPage: page,
+                pageSize
+            }
+        };
     }
+    
 
     async getPaginatedMembers(page, pageSize) {
         const { count: total, rows: memberList } = await memberRepository.findPaginated(page, pageSize);
@@ -43,6 +53,12 @@ class MemberService {
         const member = await memberRepository.findById(id);
         if (!member) {
             throw new Error('No member found with the given id');
+        }
+
+        const existingMemberWithPhone = await memberRepository.findByPhoneExcludingId(updateData.phone, id);
+    
+        if (existingMemberWithPhone) {
+            throw new Error('The phone number is already in use by another member.');
         }
 
         // 更新會員資料

@@ -4,9 +4,6 @@ const { rollCall } = require('../models/miaanRollCall'); // 確保這裡的路�
 class MemberService {
     async searchMembersByUsername(username, page, pageSize) {
         const { count: total, rows: memberList } = await memberRepository.findAllByUsername(username, page, pageSize);
-        if (memberList.length === 0) {
-            throw new Error('No members found');
-        }
 
         return {
             memberList,

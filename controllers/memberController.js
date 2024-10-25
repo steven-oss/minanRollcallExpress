@@ -6,19 +6,17 @@ exports.searchMembers = async (req, res) => {
     try {
         const { username } = req.query;
         const page = parseInt(req.query.page) || 1;
-        const pageSize = parseInt(req.query.pageSize) || 10;
+        const pageSize = parseInt(req.query.pageSize) || 5;
 
-        if (!username) {
-            return res.status(400).json({ error: 'username query parameter is required' });
+        let members;
+        if (username) {
+            members = await memberService.searchMembersByUsername(username, page, pageSize);
+        } else {
+            members = await memberService.getPaginatedMembers(page, pageSize);
         }
 
-        const paginatedData = await memberService.searchMembersByUsername(username, page, pageSize);
-
-        res.json({ 
-            message: 'successful', 
-            data: paginatedData.memberList, 
-            pagination: paginatedData.pagination
-        });
+        res.json({ message: 'successful', data: members.memberList, pagination: members.pagination });
+  
     } catch (error) {
         if (error.message === 'No members found') {
             return res.status(404).json({ message: error.message });
@@ -33,7 +31,7 @@ exports.searchMembers = async (req, res) => {
 exports.getPaginatedMembers = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const pageSize = parseInt(req.query.pageSize) || 10;
+        const pageSize = parseInt(req.query.pageSize) || 5;
         const paginatedData = await memberService.getPaginatedMembers(page, pageSize);
         res.json({ message: 'successful', data: paginatedData.memberList, pagination: paginatedData.pagination });
     } catch (error) {

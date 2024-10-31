@@ -8,13 +8,13 @@ exports.createRollCall = async (req, res) => {
 
     try {
         await rollCallService.createRollCall(date);
-        res.status(201).json({ message: 'Roll call created successfully.' });
+        res.status(201).json({ code:201,message: 'Roll call created successfully.' });
     } catch (error) {
         console.error(error);
         if (error.message.includes('has already been added')) {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ code:400,message: error.message });
         }
-        res.status(500).json({ message: 'Error creating roll call.', error });
+        res.status(500).json({ code:500,message: 'Error creating roll call.', error });
     }
 };
 
@@ -24,7 +24,7 @@ exports.getPaginatedRollCall = async (req, res) => {
 
     try {
         const page = parseInt(req.query.page) || 1;
-        const pageSize = parseInt(req.query.pageSize) || 10;
+        const pageSize = parseInt(req.query.pageSize) || 5;
 
         if(!date){
             return res.status(400).json({ message: 'Date parameter is required.' });

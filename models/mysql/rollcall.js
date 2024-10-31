@@ -8,12 +8,12 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     gender: {
-      type: DataTypes.ENUM('male','female'),
-      allowNull: true
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     isAdult: {
       type: DataTypes.BOOLEAN,
-      allowNull: true,
+      allowNull: false,
       defaultValue: 0
     },
     username: {
@@ -33,6 +33,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       allowNull: true,
       defaultValue: 0
+    },
+    notes: {
+      type: DataTypes.STRING(255),
+      allowNull: true
     }
   }, {
     sequelize,

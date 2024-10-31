@@ -18,7 +18,7 @@ class RollCallService{
     async createRollCall(date) {
         // 1. 從 member 表中獲取所有成員
         const members = await member.findAll({
-            attributes: ['id', 'username', 'gender', 'isAdult']  // 只選擇我們需要的欄位
+            attributes: ['id', 'username', 'gender', 'isAdult','notes']  // 只選擇我們需要的欄位
         });
 
         // 2. 構建需要插入 RollCall 表的資料
@@ -26,6 +26,7 @@ class RollCallService{
             gender: m.gender,
             isAdult: m.isAdult,
             username: m.username,
+            notes:m.notes,
             memberId: m.id,
             date: date,  // 使用傳遞的日期
             check: false  // 假設初始為未簽到
